@@ -15,16 +15,24 @@ export default function ReusableTable({
   columns, 
   data = [], 
   className,
+  tableClassName,
+  headerClassName,
+  rowClassName,
+  cellClassName,
   emptyMessage = "No results found.",
-  isLoading = false
+  isLoading = false,
+  footer
 }) {
   return (
-    <div className={cn("rounded-md border bg-card", className)}>
-      <Table>
-        <TableHeader>
-          <TableRow>
+    <div className={cn("rounded-md border bg-card flex flex-col", className)}>
+      <Table className={tableClassName}>
+        <TableHeader className={headerClassName}>
+          <TableRow className="hover:bg-transparent border-none">
             {columns.map((column) => (
-              <TableHead key={column.key} className={column.className}>
+              <TableHead 
+                key={column.key} 
+                className={cn("px-4", column.headerClassName || "text-muted-foreground")}
+              >
                 {column.label}
               </TableHead>
             ))}
@@ -35,7 +43,7 @@ export default function ReusableTable({
             Array.from({ length: 5 }).map((_, i) => (
               <TableRow key={i}>
                 {columns.map((column) => (
-                  <TableCell key={column.key}>
+                  <TableCell key={column.key} className="px-4">
                     <div className="h-4 w-full animate-pulse rounded bg-muted" />
                   </TableCell>
                 ))}
@@ -43,19 +51,22 @@ export default function ReusableTable({
             ))
           ) : data.length > 0 ? (
             data.map((row, rowIndex) => (
-              <TableRow key={rowIndex}>
+              <TableRow key={rowIndex} className={rowClassName}>
                 {columns.map((column) => (
-                  <TableCell key={column.key} className={column.className}>
+                  <TableCell 
+                    key={column.key} 
+                    className={cn("px-4", column.className || cellClassName)}
+                  >
                     {column.render ? column.render(row[column.key], row) : row[column.key]}
                   </TableCell>
                 ))}
               </TableRow>
             ))
           ) : (
-            <TableRow>
+            <TableRow className="hover:bg-transparent">
               <TableCell
                 colSpan={columns.length}
-                className="h-72 text-center"
+                className="h-[200px] text-center px-4"
               >
                 <div className="flex flex-col items-center justify-center gap-2 text-muted-foreground">
                   <Inbox className="h-10 w-10 opacity-20" />
@@ -66,6 +77,11 @@ export default function ReusableTable({
           )}
         </TableBody>
       </Table>
+      {footer && (
+        <div className="mt-auto border-t">
+          {footer}
+        </div>
+      )}
     </div>
   );
 }
